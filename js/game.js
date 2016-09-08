@@ -1,42 +1,40 @@
 var cnvs = document.getElementById("main_canvas");
 var ctx = cnvs.getContext("2d");
-var GameEngine={
-	cursor:{
-		x:0,
-		y:0,
-		set:function(x=0,y=0){this.x=x; this.y=y; return this;},
-		trnsltx:function(dx){this.x=this.x+dx; return this;},
-		trnslty:function(dy){this.y=this.y+dy; return this;},
-		trnslt:function(dx,dy){return this.trnsltx(dx).trnslty(dy);},
-		trnsltxy:function(dxy){return this.trnslt(dxy,dxy);},
-		toGameEngine:function(){return GameEngine;}
+var Cutil={
+	translate:function(A, dx=0 ,dy=0){return {x: A.x+dx , y: A.y+dy};},
+	rotate:function(A, T=Math.PI){return {x: A.x*Math.cos(T)-A.y*Math.sin(T) , y: A.x*Math.sin(T)+A.y*Math.cos(T)};},
+	rotatefrom:function(O, A, T=Math.PI){return Cutil.translate(Cutil.rotate(Cutil.translate(A, -O.x, -O.y), T), O.x, O.y);}
+};
+var Cdraw={
+	line:function(CTX, A, B){
+		CTX.moveTo(A.x, A.y);
+		CTX.lineTo(B.x, B.y);
+		return CTX;
 	},
-	stroke:function(){ctx.stroke();return this;},
-	fill:function(){ctx.fill();return this;},
-	dim:{width:500, height:500},
-	bc_color:"#A9A9A9", ln_color:"#000000", cop_color:"#FF0000",
-	backround:function(w, h){
-		ctx.fillStyle=this.bc_color;
-		ctx.fillRect(this.cursor.x, this.cursor.y, w, h);
-		return this;
+	rect:function(CTX, A, D){
+		CTX.rect(A.x, A.y, D.w, D.h);
+		return CTX;
 	},
-	line:function(a, b){
-		ctx.fillStyle=this.ln_color;
-		ctx.moveTo(this.cursor.x, this.cursor.y);
-		ctx.lineTo(a, b);
-		return this.stroke();
-	},
-	circle:function(r, rad1=0, rad2=2*Math.PI){
-		ctx.fillStyle = this.ln_color;
-		ctx.beginPath();
-		ctx.arc(this.cursor.x, this.cursor.y, r, rad1, rad2);
-		return this;
-	},
-	start:function(){
-		/* Do something here */
-		this.cursor.set();
-		return this.backround(this.dim.width, this.dim.height);
+	circle:function(CTX, A, R, color){
+		CTX.beginPath();
+		CTX.arc(A.x, A.y, R,0,2*Math.PI);
+		return CTX;
 	}
 };
-//Launch
-GameEngine.start();
+
+center={x:cnvs.width/2, y:cnvs.height/2};
+ctx.fillStyle="#000000";
+Cdraw.line(ctx, {x:0,y:cnvs.height/2}, {x:cnvs.width,y:cnvs.height/2}).stroke();
+Cdraw.line(ctx, {x:cnvs.width/2,y:0}, {x:cnvs.width/2,y:cnvs.height}).stroke();
+Cdraw.circle(ctx, center, cnvs.width/2).stroke();
+Cdraw.circle(ctx, center, 20).fill();
+loc_size_radius=6;
+//first
+kizo={x:cnvs.width,y:cnvs.height/2};
+Cdraw.circle(ctx, kizo, loc_size_radius).fill();
+for(i=1;i<12;i++){
+	kizo=Cutil.rotatefrom(center,kizo, Math.PI/(i%3==2?3:12));
+	Cdraw.circle(ctx, kizo, loc_size_radius).fill();
+}
+	
+

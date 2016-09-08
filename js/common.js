@@ -1,36 +1,21 @@
-
-var cnvs = document.getElementById("main_canvas");
-var cnvs_bg_color="#ffffff";
-var cnvs_ln_color="#000000";
-var ctx = cnvs.getContext("2d");
-function test() {
-	
-	rect(ctx, 0, 0, cnvs.width, cnvs.height, cnvs_bg_color);
-	line(ctx, 0, cnvs.height/2, cnvs.width, cnvs.height/2, cnvs_ln_color);
-	line(ctx, cnvs.width/2, 0, cnvs.width/2, cnvs.height, cnvs_ln_color);
-	circle(ctx, cnvs.width/2, cnvs.height/2, cnvs.width/2, cnvs_ln_color);
-	
-	circle(ctx, cnvs.width, cnvs.height/2, cnvs.width/8, cnvs_ln_color);
-	circle(ctx, cnvs.width/2, 0, cnvs.width/8, cnvs_ln_color);
-	circle(ctx, 0, cnvs.height/2, cnvs.width/8, cnvs_ln_color);
-	circle(ctx, cnvs.width/2, cnvs.height, cnvs.width/8, cnvs_ln_color);
-	
-	circle(ctx, cnvs.width/2, cnvs.height/2, cnvs.width/8, cnvs_ln_color);
-}
-
-function rect(canvas_context, x, y, w, h, color) {
-	canvas_context.fillStyle = color;
-	canvas_context.fillRect(x, y, w, h);
-}
-function line(canvas_context, a , b, c, d, color) {
-	canvas_context.fillStyle = color;
-	canvas_context.moveTo(a,b);
-	canvas_context.lineTo(c, d);
-	canvas_context.stroke();
-}
-function circle(canvas_context, x, y, r, color){
-	canvas_context.fillStyle = color;
-	canvas_context.beginPath();
-	canvas_context.arc(x, y, r,0,2*Math.PI);
-	canvas_context.stroke();
-}
+var Cutil={
+	translate:function(A, dx=0 ,dy=0){return {x: A.x+dx , y: A.y+dy};},
+	rotate:function(A, T=Math.PI){return {x: A.x*Math.cos(T)-A.y*Math.sin(T) , y: A.x*Math.sin(T)+A.y*Math.cos(T)};},
+	rotatefrom:function(O, A, T=Math.PI){return Cutil.translate(Cutil.rotate(Cutil.translate(A, -O.x, -O.y), T), O.x, O.y);}
+};
+var Cdraw={
+	line:function(CTX, A, B){
+		CTX.moveTo(A.x, A.y);
+		CTX.lineTo(B.x, B.y);
+		return CTX;
+	},
+	rect:function(CTX, A, D){
+		CTX.rect(A.x, A.y, D.w, D.h);
+		return CTX;
+	},
+	circle:function(CTX, A, R, color){
+		CTX.beginPath();
+		CTX.arc(A.x, A.y, R,0,2*Math.PI);
+		return CTX;
+	}
+};
